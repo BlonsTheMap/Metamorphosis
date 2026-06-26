@@ -1,0 +1,44 @@
+[gd_scene format=4 uid="uid://kxs6tgcq7k27"]
+
+[ext_resource type="Texture2D" uid="uid://btoirb12tfpac" path="res://tiles.png" id="1_h2yge"]
+[ext_resource type="PackedScene" uid="uid://cmyjgcfgffxys" path="res://Lizard/lizard.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://c13do87yyogj5" path="res://level_transition.gd" id="3_h2yge"]
+[ext_resource type="PackedScene" uid="uid://btk600wojt3sa" path="res://Levels/l1.tscn" id="4_1bvp3"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7mycd"]
+texture = ExtResource("1_h2yge")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, 6, 8, 6, 8, 8, -8, 8)
+0:1/0 = 0
+0:1/0/physics_layer_1/polygon_0/points = PackedVector2Array(-5, -4, 4, -4, 4, 5, -5, 5)
+
+[sub_resource type="TileSet" id="TileSet_272bh"]
+physics_layer_0/collision_layer = 2
+physics_layer_1/collision_layer = 4
+physics_layer_2/collision_layer = 8
+sources/0 = SubResource("TileSetAtlasSource_7mycd")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1bvp3"]
+size = Vector2(16, 32)
+
+[node name="Main" type="Node2D" unique_id=2046405940]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=484930941]
+position = Vector2(0, 7)
+tile_map_data = PackedByteArray("AADx/wcAAAAAAAAAAADy/wcAAAAAAAAAAADz/wcAAAAAAAAAAAD0/wcAAAAAAAAAAAD1/wcAAAAAAAAAAAD2/wcAAAAAAAAAAAD3/wcAAAAAAAAAAAD4/wcAAAAAAAAAAAD5/wcAAAAAAAAAAAD6/wcAAAAAAAAAAAD7/wcAAAAAAAAAAAD8/wcAAAAAAAAAAAD9/wcAAAAAAAAAAAD+/wcAAAAAAAAAAAD//wcAAAAAAAAAAAAAAAcAAAAAAAAAAAABAAcAAAAAAAAAAAACAAcAAAAAAAAAAAADAAcAAAAAAAAAAAAEAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAHAAcAAAAAAAAAAAAIAAcAAAAAAAAAAAAJAAcAAAAAAAAAAAAKAAcAAAAAAAAAAAALAAcAAAAAAAAAAAAMAAcAAAAAAAAAAAANAAcAAAAAAAAAAAAOAAcAAAAAAAAAAAAOAAYAAAAAAAAAAAAOAAMAAAAAAAAAAAAOAAIAAAAAAAAAAAAOAAEAAAAAAAAAAAAOAAAAAAAAAAAAAAAOAP//AAAAAAAAAAAIAAMAAAAAAAAAAAAHAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAACAAUAAAAAAAAAAAABAAUAAAAAAAAAAAANAAMAAAAAAAAAAAAMAAMAAAAAAAAAAAALAAMAAAAAAAAAAAAKAAMAAAAAAAAAAAAJAAMAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_272bh")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=768344215]
+
+[node name="Lizard" parent="." unique_id=2073992279 instance=ExtResource("2_0xm2m")]
+
+[node name="levelTransition" type="Area2D" parent="." unique_id=1329363644]
+position = Vector2(248, 87)
+collision_layer = 0
+script = ExtResource("3_h2yge")
+scene = ExtResource("4_1bvp3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="levelTransition" unique_id=661790934]
+shape = SubResource("RectangleShape2D_1bvp3")

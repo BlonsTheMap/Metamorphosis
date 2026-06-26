@@ -1,0 +1,198 @@
+extends CharacterBody2D
+
+@export var speed := 200
+@export var jumpVelocity := 280
+@export var gravity := 1200
+@export var highGravity = 1600
+@export var maxFallSpeed := 300
+
+@onready var sprite := $Sprite2D
+@onready var collider := $CollisionShape2D
+@onready var hitbox := $Area2D
+
+var direction : Vector2i
+
+var dead := false
+var deadTimer := 100
+
+var touchingRight := 0
+var touchingLeft := 0
+
+enum States{FALL, LEFT, RIGHT, UP, DOWN}
+var state := States.FALL
+
+var jumpBuffer := false
+var coyote := 0
+
+var holdTimer = 20
+
+func fall(delta: float):
+	sprite.set_rotation_degrees(0)
+	collider.set_rotation_degrees(0)
+	hitbox.set_rotation_degrees(0)
+	
+	if velocity.y < 0:
+		velocity.y = move_toward(velocity.y, maxFallSpeed, gravity*delta)
+		if Input.is_action_just_released("Jump"):
+			velocity.y /= 2
+	else:
+		velocity.y = move_toward(velocity.y, maxFallSpeed, highGravity*delta)
+	
+	if not dead:
+		velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+		if coyote > 0 and jumpBuffer:
+			velocity.y = -jumpVelocity
+			jumpBuffer = false
+	
+	if is_on_floor():
+		state = States.DOWN
+	if is_on_ceiling():
+		state = States.UP
+		velocity.y = -200
+	coyote -= 1
+
+func left(delta: float):
+	if not is_on_wall() or touchingLeft <= 0:
+		state = States.FALL
+		return
+	
+	sprite.set_rotation_degrees(90)
+	collider.set_rotation_degrees(90)
+	hitbox.set_rotation_degrees(90)
+	velocity.y = move_toward(velocity.y, speed*direction.y, speed/3)
+	velocity.x = -40
+	
+	if jumpBuffer and not dead:
+		velocity.x = jumpVelocity
+		velocity.y -= 80
+		jumpBuffer = false
+
+func right(delta: float):
+	if not is_on_wall() or touchingRight <= 0:
+		state = States.FALL
+		return
+	
+	sprite.set_rotation_degrees(270)
+	collider.set_rotation_degrees(270)
+	hitbox.set_rotation_degrees(270)
+	velocity.y = move_toward(velocity.y, speed*direction.y, speed/3)
+	velocity.x = 40
+	
+	if jumpBuffer and not dead:
+		velocity.x = -jumpVelocity
+		velocity.y -= 80
+		jumpBuffer = false
+
+func up(delta: float):
+	sprite.set_rotation_degrees(180)
+	collider.set_rotation_degrees(0)
+	hitbox.set_rotation_degrees(0)
+	velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+	
+	if jumpBuffer and not dead:
+		velocity.y = jumpVelocity - 120
+		jumpBuffer = false
+	
+	if not is_on_ceiling():
+		velocity.y = move_toward(velocity.y, maxFallSpeed, gravity * delta)
+		if velocity.y >= 0:
+			state = States.FALL
+
+func down(delta: float):
+	sprite.set_rotation_degrees(0)
+	collider.set_rotation_degrees(0)
+	hitbox.set_rotation_degrees(0)
+	velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+	
+	if jumpBuffer and not dead:
+		velocity.y = -jumpVelocity
+		jumpBuffer = false
+	
+	if not is_on_floor():
+		state = States.FALL
+		coyote = 6
+
+func _physics_process(delta: float) -> void:
+	if holdTimer != 0:
+		holdTimer -= 1
+		return
+	
+	direction = Vector2(Input.get_axis("Left", "Right"), Input.get_axis("Up", "Down"))
+	
+	if Input.is_action_just_pressed("Jump"):
+		jumpBuffer = true
+	if Input.is_action_just_released("Jump"):
+		jumpBuffer = false
+	if dead:
+		direction = Vector2(0,0)
+		deadTimer -= 1
+		if position.y > 150 or not deadTimer:
+			get_tree().reload_current_scene()
+	
+	match state:
+		States.FALL:
+			fall(delta)
+		States.LEFT:
+			left(delta)
+		States.RIGHT:
+			right(delta)
+		States.UP:
+			up(delta)
+		States.DOWN:
+			down(delta)
+	
+	if is_on_floor() and Input.is_action_pressed("Down"):
+		state = States.DOWN
+	else:
+		if touchingLeft and Input.is_action_pressed("Left") and state != States.LEFT:
+			position.x -= 8
+			state = States.LEFT
+			velocity.y /= 2
+		else:
+			if touchingRight and Input.is_action_pressed("Right") and state != States.RIGHT:
+				state = States.RIGHT
+				position.x += 8
+				velocity.y /= 2
+			else:
+				
+				if is_on_ceiling() and Input.is_action_pressed("Up"):
+					state = States.UP
+					velocity.y = -200
+					collider.set_rotation_degrees(0)
+	
+	move_and_slide()
+	print(state)
+	print(touchingLeft)
+	print(touchingRight)
+
+func die():
+	if not dead:
+		dead = true
+		set_collision_layer_value(1, false)
+		set_collision_mask_value(2, false)
+		velocity.y = -jumpVelocity
+		velocity.x *= -1
+		velocity.x += randi_range(-80,80)
+
+func _on_area_2d_body_shape_entered(body_rid: RID, body: Node2D, body_shape_index: int, local_shape_index: int) -> void:
+	die()
+
+func _on_left_area_body_shape_entered(body_rid: RID, body: Node2D, body_shape_index: int, local_shape_index: int) -> void:
+	touchingLeft += 1
+	print("touching left")
+
+func _on_left_area_body_shape_exited(body_rid: RID, body: Node2D, body_shape_index: int, local_shape_index: int) -> void:
+	touchingLeft -= 1
+	if touchingLeft < 0:
+		touchingLeft = 0
+	print("not touching left")
+
+func _on_right_area_body_shape_entered(body_rid: RID, body: Node2D, body_shape_index: int, local_shape_index: int) -> void:
+	touchingRight += 1
+	print("touching right")
+
+func _on_right_area_body_shape_exited(body_rid: RID, body: Node2D, body_shape_index: int, local_shape_index: int) -> void:
+	touchingRight -= 1
+	if touchingRight < 0:
+		touchingRight = 0
+	print("not touching right")
