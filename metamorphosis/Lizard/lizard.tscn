@@ -17,6 +17,10 @@ size = Vector2(4, 1)
 collision_mask = 10
 slide_on_ceiling = false
 script = ExtResource("1_3ihi6")
+speed = 150
+jumpVelocity = 250
+gravity = 800
+highGravity = 1200
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1389829153]
 texture = ExtResource("2_x8g2k")

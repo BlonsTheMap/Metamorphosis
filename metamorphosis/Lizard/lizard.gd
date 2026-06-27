@@ -39,7 +39,7 @@ func fall(delta: float):
 		velocity.y = move_toward(velocity.y, maxFallSpeed, highGravity*delta)
 	
 	if not dead:
-		velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+		velocity.x = move_toward(velocity.x, speed*direction.x, speed/5)
 		if coyote > 0 and jumpBuffer:
 			velocity.y = -jumpVelocity
 			jumpBuffer = false
@@ -52,8 +52,9 @@ func fall(delta: float):
 	coyote -= 1
 
 func left(delta: float):
-	if not is_on_wall() or touchingLeft <= 0:
+	if not is_on_wall():
 		state = States.FALL
+		velocity.y = 0
 		return
 	
 	sprite.set_rotation_degrees(90)
@@ -63,13 +64,14 @@ func left(delta: float):
 	velocity.x = -40
 	
 	if jumpBuffer and not dead:
-		velocity.x = jumpVelocity
-		velocity.y -= 80
+		velocity = Vector2(jumpVelocity, -jumpVelocity)
 		jumpBuffer = false
+		state = States.FALL
 
 func right(delta: float):
-	if not is_on_wall() or touchingRight <= 0:
+	if not is_on_wall():
 		state = States.FALL
+		velocity.y = 0
 		return
 	
 	sprite.set_rotation_degrees(270)
@@ -79,9 +81,9 @@ func right(delta: float):
 	velocity.x = 40
 	
 	if jumpBuffer and not dead:
-		velocity.x = -jumpVelocity
-		velocity.y -= 80
+		velocity = Vector2(-jumpVelocity, -jumpVelocity)
 		jumpBuffer = false
+		state = States.FALL
 
 func up(delta: float):
 	sprite.set_rotation_degrees(180)
@@ -126,8 +128,8 @@ func _physics_process(delta: float) -> void:
 	if dead:
 		direction = Vector2(0,0)
 		deadTimer -= 1
-		if position.y > 150 or not deadTimer:
-			get_tree().reload_current_scene()
+	if position.y > 150 or not deadTimer or Input.is_action_just_pressed("Reset"):
+		get_tree().reload_current_scene()
 	
 	match state:
 		States.FALL:
@@ -141,24 +143,26 @@ func _physics_process(delta: float) -> void:
 		States.DOWN:
 			down(delta)
 	
-	if is_on_floor() and Input.is_action_pressed("Down"):
-		state = States.DOWN
-	else:
-		if touchingLeft and Input.is_action_pressed("Left") and state != States.LEFT:
-			position.x -= 8
-			state = States.LEFT
-			velocity.y /= 2
-		else:
-			if touchingRight and Input.is_action_pressed("Right") and state != States.RIGHT:
-				state = States.RIGHT
-				position.x += 8
+	if dead:
+		state = States.FALL
+	else: 
+		if is_on_floor() and velocity.y > 0:
+			state = States.DOWN
+		else: 
+			if touchingLeft and velocity.x < 0 and state != States.LEFT:
+				position.x -= 4
+				state = States.LEFT
 				velocity.y /= 2
-			else:
-				
-				if is_on_ceiling() and Input.is_action_pressed("Up"):
-					state = States.UP
-					velocity.y = -200
-					collider.set_rotation_degrees(0)
+			else: 
+				if touchingRight and velocity.x > 0 and state != States.RIGHT:
+					state = States.RIGHT
+					position.x += 4
+					velocity.y /= 2
+				else:
+					if is_on_ceiling() and velocity.y < 0:
+						state = States.UP
+						velocity.y = -200
+						collider.set_rotation_degrees(0)
 	
 	move_and_slide()
 	print(state)
