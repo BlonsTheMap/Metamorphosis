@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://btk600wojt3sa"]
 
 [ext_resource type="Texture2D" uid="uid://btoirb12tfpac" path="res://tiles.png" id="1_6wrcs"]
-[ext_resource type="PackedScene" uid="uid://cmyjgcfgffxys" path="res://Lizard/lizard.tscn" id="2_k65m5"]
+[ext_resource type="PackedScene" uid="uid://bs7n0rvh6a4di" path="res://Bird/bird.tscn" id="2_6wrcs"]
 [ext_resource type="Script" uid="uid://c13do87yyogj5" path="res://level_transition.gd" id="3_15ygs"]
 [ext_resource type="PackedScene" uid="uid://c4mfnemllnx76" path="res://Levels/l2.tscn" id="4_6wrcs"]
 
@@ -32,9 +32,8 @@ tile_set = SubResource("TileSet_272bh")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=768344215]
 
-[node name="Lizard" parent="." unique_id=2073992279 instance=ExtResource("2_k65m5")]
-position = Vector2(-200, -140)
-slide_on_ceiling = true
+[node name="Bird" parent="." unique_id=2073992279 instance=ExtResource("2_6wrcs")]
+position = Vector2(5.6744804, -6.198985)
 
 [node name="levelTransition" type="Area2D" parent="." unique_id=1329363644]
 position = Vector2(256, 8)

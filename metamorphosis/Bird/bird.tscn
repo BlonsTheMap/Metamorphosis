@@ -1,7 +1,98 @@
 [gd_scene format=3 uid="uid://bs7n0rvh6a4di"]
 
 [ext_resource type="Script" uid="uid://mn786egg2w85" path="res://Bird/bird.gd" id="1_crnqq"]
-[ext_resource type="Texture2D" uid="uid://wkpmvmhhcslu" path="res://Bird/player1.png" id="2_j88tq"]
+[ext_resource type="Texture2D" uid="uid://75pqjxyh8axo" path="res://Bird/bird_sprites.png" id="2_2vrvt"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6cpm"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(48, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2vrvt"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(0, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2vl2o"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(32, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eigh1"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(64, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p4nh3"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_voqyb"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_50pqo"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k1dk8"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(48, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n6e5n"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(64, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_whaaa"]
+atlas = ExtResource("2_2vrvt")
+region = Rect2(80, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_voqyb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6cpm")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2vrvt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2vl2o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6cpm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eigh1")
+}],
+"loop": false,
+"name": &"flap",
+"speed": 15.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p4nh3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_voqyb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_50pqo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k1dk8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n6e5n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_whaaa")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_5vw27"]
 points = PackedVector2Array(0, -6, 6, 7, -6, 7)
@@ -13,8 +104,9 @@ radius = 6.0
 collision_mask = 10
 script = ExtResource("1_crnqq")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1389829153]
-texture = ExtResource("2_j88tq")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=272638023]
+sprite_frames = SubResource("SpriteFrames_voqyb")
+animation = &"flap"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=183819381]
 shape = SubResource("ConvexPolygonShape2D_5vw27")

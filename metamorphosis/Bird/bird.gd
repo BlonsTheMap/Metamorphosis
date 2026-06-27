@@ -9,7 +9,13 @@ extends CharacterBody2D
 var direction : Vector2i
 var dead := false
 
+@onready var sprite = $AnimatedSprite2D
+
 func _physics_process(delta: float) -> void:
+	if velocity.x < 0:
+		sprite.flip_h = false
+	if velocity.x > 0:
+		sprite.flip_h = true
 	if dead and position.y > 150:
 		get_tree().reload_current_scene()
 	
@@ -18,6 +24,7 @@ func _physics_process(delta: float) -> void:
 	if not dead:
 		if is_on_floor():
 			velocity.x = 0
+			sprite.play("idle")
 			if direction.x:
 				velocity.y = -100
 		else:
@@ -30,9 +37,12 @@ func _physics_process(delta: float) -> void:
 				velocity.y /= 2
 		else:
 			velocity.y = move_toward(velocity.y, maxFallSpeed, highGravity*delta)
+			if not sprite.is_playing():
+				sprite.play("fall")
 	
 	if Input.is_action_just_pressed("Jump") and not dead:
 		velocity.y = jumpVelocity
+		sprite.play("flap")
 	
 	move_and_slide()
 

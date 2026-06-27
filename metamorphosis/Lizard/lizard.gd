@@ -6,7 +6,7 @@ extends CharacterBody2D
 @export var highGravity = 1600
 @export var maxFallSpeed := 300
 
-@onready var sprite := $Sprite2D
+@onready var sprite := $AnimatedSprite2D
 @onready var collider := $CollisionShape2D
 @onready var hitbox := $Area2D
 
@@ -28,15 +28,24 @@ var holdTimer = 20
 
 func fall(delta: float):
 	sprite.set_rotation_degrees(0)
+	sprite.position = Vector2(0,-5)
+	sprite.flip_v = false
 	collider.set_rotation_degrees(0)
 	hitbox.set_rotation_degrees(0)
 	
 	if velocity.y < 0:
+		sprite.play("jump")
 		velocity.y = move_toward(velocity.y, maxFallSpeed, gravity*delta)
 		if Input.is_action_just_released("Jump"):
 			velocity.y /= 2
 	else:
 		velocity.y = move_toward(velocity.y, maxFallSpeed, highGravity*delta)
+		sprite.play("fall")
+	
+	if velocity.x < 0:
+		sprite.flip_h = false
+	if velocity.x > 0:
+		sprite.flip_h = true
 	
 	if not dead:
 		velocity.x = move_toward(velocity.x, speed*direction.x, speed/5)
@@ -58,10 +67,22 @@ func left(delta: float):
 		return
 	
 	sprite.set_rotation_degrees(90)
+	sprite.position = Vector2(5,0)
+	sprite.flip_v = false
 	collider.set_rotation_degrees(90)
 	hitbox.set_rotation_degrees(90)
 	velocity.y = move_toward(velocity.y, speed*direction.y, speed/3)
 	velocity.x = -40
+	
+	if velocity.y < 0:
+		sprite.flip_h = false
+		sprite.play("walk")
+	else: 
+		if velocity.y > 0:
+			sprite.flip_h = true
+			sprite.play("walk")
+		else:
+			sprite.play("idle")
 	
 	if jumpBuffer and not dead:
 		velocity = Vector2(jumpVelocity, -jumpVelocity)
@@ -74,11 +95,23 @@ func right(delta: float):
 		velocity.y = 0
 		return
 	
-	sprite.set_rotation_degrees(270)
+	sprite.set_rotation_degrees(90)
+	sprite.position = Vector2(-5,0)
+	sprite.flip_v = true
 	collider.set_rotation_degrees(270)
 	hitbox.set_rotation_degrees(270)
 	velocity.y = move_toward(velocity.y, speed*direction.y, speed/3)
 	velocity.x = 40
+	
+	if velocity.y < 0:
+		sprite.flip_h = false
+		sprite.play("walk")
+	else: 
+		if velocity.y > 0:
+			sprite.flip_h = true
+			sprite.play("walk")
+		else:
+			sprite.play("idle")
 	
 	if jumpBuffer and not dead:
 		velocity = Vector2(-jumpVelocity, -jumpVelocity)
@@ -86,10 +119,22 @@ func right(delta: float):
 		state = States.FALL
 
 func up(delta: float):
-	sprite.set_rotation_degrees(180)
+	sprite.set_rotation_degrees(0)
+	sprite.position = Vector2(0,5)
+	sprite.flip_v = true
 	collider.set_rotation_degrees(0)
 	hitbox.set_rotation_degrees(0)
 	velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+	
+	if velocity.x < 0:
+		sprite.flip_h = false
+		sprite.play("walk")
+	else: 
+		if velocity.x > 0:
+			sprite.flip_h = true
+			sprite.play("walk")
+		else:
+			sprite.play("idle")
 	
 	if jumpBuffer and not dead:
 		velocity.y = jumpVelocity - 120
@@ -102,9 +147,21 @@ func up(delta: float):
 
 func down(delta: float):
 	sprite.set_rotation_degrees(0)
+	sprite.position = Vector2(0,-5)
+	sprite.flip_v = false
 	collider.set_rotation_degrees(0)
 	hitbox.set_rotation_degrees(0)
 	velocity.x = move_toward(velocity.x, speed*direction.x, speed/3)
+	
+	if velocity.x < 0:
+		sprite.flip_h = false
+		sprite.play("walk")
+	else: 
+		if velocity.x > 0:
+			sprite.flip_h = true
+			sprite.play("walk")
+		else:
+			sprite.play("idle")
 	
 	if jumpBuffer and not dead:
 		velocity.y = -jumpVelocity
